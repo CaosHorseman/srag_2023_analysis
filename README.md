@@ -5,7 +5,7 @@ Este repositório reúne um pipeline completo de ciência de dados aplicado à b
 
 A estrutura do projeto foi construída a partir dos seguintes insumos:
 
-- **Base SRAG 2023–2025** (`INFLUD23-26-06-2025.parquet`)  
+- **Base SRAG 2023** (`INFLUD23-26-06-2025.parquet`)  
 - **Tabela complementar** (`srag_total.xlsx`)  
 - **Dicionário oficial de variáveis SRAG** (`Dicionario_de_Dados_SRAG_Hospitalizado.pdf`)  
 - **Descrição completa do desafio** (`Desafio - Ciência de Dados - NIM (2).docx`)  
