@@ -66,7 +66,7 @@ python src/modeling.py
 - Modelos preditivos  
 - Documento de recomendações  
 
-## 🔮 Visão de Futuro
+## 🔮 Próximos Passos
 
 - Monitoramento em tempo real  
 - Previsão de ondas  
