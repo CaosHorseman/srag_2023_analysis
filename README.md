@@ -1,4 +1,4 @@
-# 🔬 Análise de SRAG (Síndrome Respiratória Aguda Grave) — 2023 a 2025  
+# 🔬 Análise de SRAG (Síndrome Respiratória Aguda Grave) — 2023 
 Projeto para o Desafio de Ciência de Dados NIM / AutoGlass
 
 Este repositório reúne um pipeline completo de ciência de dados aplicado à base nacional de **SRAG (SIVEP-Gripe)** do *Open Data SUS*, cobrindo desde ingestão e tratamento dos dados até análises epidemiológicas e modelagem preditiva.
