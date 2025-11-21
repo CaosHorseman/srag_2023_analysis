@@ -6,6 +6,8 @@ numpy>=1.24.0
 matplotlib>=3.7.0
 seaborn>=0.12.0
 openpyxl
+streamlit
+
 
 # Machine Learning e Modelagem Estatística
 scikit-learn>=1.2.0
@@ -13,8 +15,12 @@ xgboost>=1.7.0  # Recomendado para classificação de gravidade
 lightgbm>=3.3.0
 shap>=0.41.0    # Para seleção de features e explicabilidade 
 imbalanced-learn # Útil, dado o desbalanceamento comum em desfechos de óbito
+joblib
 
 # Ferramentas de Desenvolvimento e Jupyter
 jupyter
 ipykernel
 black # Para formatação de código (boas práticas)
+
+
+
