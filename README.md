@@ -1,74 +1,140 @@
-# 🔬 Análise de SRAG (Síndrome Respiratória Aguda Grave) — 2023 
-Projeto para o Desafio de Ciência de Dados NIM / AutoGlass
+## 🔬 Análise Epidemiológica e Modelagem Preditiva de SRAG – Brasil 2023
 
-Este repositório reúne um pipeline completo de ciência de dados aplicado à base nacional de **SRAG (SIVEP-Gripe)** do *Open Data SUS*, cobrindo desde ingestão e tratamento dos dados até análises epidemiológicas e modelagem preditiva.
+Este repositório conduz uma investigação completa do comportamento de casos de SRAG hospitalizados no Brasil em 2023, integrando:
 
-A estrutura do projeto foi construída a partir dos seguintes insumos:
+1. **Saneamento e engenharia de dados**  
+2. **EDA estruturada por blocos epidemiológicos**  
+3. **Modelos de ML para predição de óbito**  
+4. **Protótipo de aplicação para score de risco**
 
-- **Base SRAG 2023** (`INFLUD23-26-06-2025.parquet`)  
-- **Tabela complementar** (`srag_total.xlsx`)  
-- **Dicionário oficial de variáveis SRAG** (`Dicionario_de_Dados_SRAG_Hospitalizado.pdf`)  
-- **Descrição completa do desafio** (`Desafio - Ciência de Dados - NIM (2).docx`)  
-- **Repositório**: https://github.com/CaosHorseman/srag_2023_analysis
+---
 
-O objetivo é transformar essas fontes em um ecossistema analítico claro, reprodutível e útil para decisões de saúde pública.
+## 1. Dados e Fontes
 
-## 📁 Estrutura do Projeto
+### Fontes principais:
+- SRAG 2023 (SIVEP-Gripe — Open Data SUS)  
+- Dicionário SRAG oficial  
+- Arquivo do desafio NIM (AutoGlass)  
+- Bases auxiliares (`srag_total`, dicionário refinado, parquet/csv tipado)
 
-```
-├── data/
-│   ├── raw/
-│   │   ├── INFLUD23-26-06-2025.parquet
-│   │   ├── srag_total.xlsx
-│   ├── docs/
-│   │   ├── Dicionario_de_Dados_SRAG_Hospitalizado.pdf
-│   │   ├── Desafio - Ciência de Dados - NIM (2).docx
-│
-├── notebooks/
-│   ├── 00_Exploracao_Inicial.ipynb
-│   ├── 01_Tratamento_Dados.ipynb
-│   ├── 02_Analise_Descritiva.ipynb
-│   ├── 03_Modelagem_Preditiva.ipynb
-│   ├── 04_Insights_Recomendacoes.ipynb
-│
-├── src/
-│   ├── load.py
-│   ├── preprocess.py
-│   ├── features.py
-│   ├── analysis.py
-│   ├── modeling.py
-│   └── viz.py
-│
-└── README.md
-```
+### Estrutura de dados:
+- `data/raw/`
+- `data/processed/`
+- `docs/` (documentos oficiais)
+- `reports/` (gráficos)
+- `models/` (modelos salvos)
 
-## 🧬 Objetivos Analíticos
+---
 
-1. Tratamento da Base  
-2. Análise Descritiva  
-3. Modelagem Preditiva (Óbito vs Não Óbito)  
-4. Insights Epidemiológicos  
+## 2. Engenharia de Dados
 
-## 🚀 Pipeline de Execução
+Criamos variáveis derivadas robustas:
+
+### Grupos de risco
+- Idade (`NU_IDADE_N`)  
+- Nº de comorbidades (`N_COMORB`)  
+- Flag `HAS_COMORB`  
+- Flags individuais (diabetes, cardiopatia, renal, hepática etc.)
+
+### Gravidade
+- `UTI_flag`  
+- `SUPORT_VEN`  
+- Escala de severidade (0 sem suporte → 3 ventilação invasiva)
+
+### Tempo
+- `dias_sin_interna_cl`  
+- `dias_sin_uti_cl`  
+- Datas limpas (0–60 dias)
+
+### Geografia e contexto social
+- UF  
+- Região  
+- Zona urbana/rural  
+- Capital/interior  
+- Macro-raça  
+- Estação do ano (a partir da data de sintomas)
+
+---
+
+## 3. EDA — Principais Resultados
+
+### Grupos de risco
+- Idosos e pacientes com múltiplas comorbidades concentram os óbitos.  
+- Diferenças por raça/cor são reais, mas moduladas pelo território.
+
+### Gravidade
+- Ventilação invasiva ≈ 50% de mortalidade.  
+- Escala de severidade cresce de forma monotônica com risco.
+
+### Tempo / Sazonalidade
+- Sintomas → internação: ~2–3 dias  
+- Sintomas → UTI: ~3 dias  
+- Sintomas → desfecho: ~9–10 dias  
+- Letalidade sobe na primavera/verão sem aumento proporcional de UTI.
+
+### Geografia
+- Sudeste concentra casos.  
+- UF e tipo de município revelam hotspots de letalidade.  
+- Zona rural/periurbana pode ter maior risco em alguns recortes.
+
+---
+
+## 4. Modelagem (Óbito vs Não Óbito)
+
+### Alvo
+`EVOLUCAO_BIN` (0 = não óbito, 1 = óbito)
+
+### Models
+- **Regressão Logística**  
+- **Random Forest**
+
+### Desempenho (teste)
+- ROC-AUC ≈ 0,89–0,90  
+- PR-AUC ≈ 0,56–0,58  
+- Recall (óbito) ≈ 0,83–0,84  
+- F1 ≈ 0,50–0,51  
+
+### Interpretação
+- Bons ranqueadores de risco, coerentes com achados epidemiológicos.  
+- Recall alto → útil para triagem.  
+- Calibração pode ser refinada.
+
+---
+
+## 5. Produto (Streamlit + Docker)
+
+App permite:
+- Entrada dos dados do paciente  
+- Estimativa da probabilidade de óbito  
+- Faixa de risco gerada pelo modelo  
+
+Deploy em Docker:
 
 ```bash
-pip install -r requirements.txt
-python src/load.py
-python src/preprocess.py
-jupyter notebook
-python src/modeling.py
+docker build -t srag-risk-app .
+docker run -p 8501:8501 srag-risk-app
 ```
 
-## 📊 Principais Produtos Finais
+---
 
-- Dataset tratado  
-- Painéis gráficos  
-- Modelos preditivos  
-- Documento de recomendações  
+## 6. Conclusões
 
-## 🔮 Próximos Passos
+- Idade, comorbidades e severidade são determinantes centrais.  
+- O sistema opera em patamar alto de gravidade durante todo o ano.  
+- Letalidade tardia sugere efeitos de mix viral e pressão sistêmica.  
+- Modelos oferecem suporte real para triagem e vigilância.
 
-- Monitoramento em tempo real  
-- Previsão de ondas  
-- Detecção precoce de surtos  
-- Classificação automatizada de risco individual  
+---
+
+## 7. Recomendações
+
+- Adoção de score de risco na admissão.  
+- Painéis de inequidade contínuos.  
+- Melhoria da qualidade de preenchimento (datas, raça, comorbidades).  
+- Validações adicionais (temporal, externa).  
+
+---
+
+## 8. Licença
+
+MIT License.
