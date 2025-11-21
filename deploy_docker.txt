@@ -1,0 +1,5 @@
+# Build da imagem
+docker build -t srag-risk-app .
+
+# Rodar o container
+docker run -p 8501:8501 srag-risk-app
